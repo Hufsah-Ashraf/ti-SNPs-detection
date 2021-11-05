@@ -1,4 +1,6 @@
 # Hufsah , 12.3.2021
+
+
 import math
 from collections import defaultdict
 
@@ -20,7 +22,9 @@ print("Detected {} samples:".format(len(SAMPLES)))
 rule all:
     input:
         expand('output/{sample}/snp_strand_counts.txt', sample = SAMPLES),
-        expand('per_sample_configs/{sample}_snp_ref_inv.txt', sample = SAMPLES)
+        expand('per_sample_configs/{sample}_snp_ref_inv.txt', sample = SAMPLES),
+         expand('per_sample_configs_clean/{sample}_snp_ref_inv.txt', sample = SAMPLES),
+        'one_table_per_snp.txt'
 
 
 rule snp_strand_counts_1toX:
@@ -75,7 +79,26 @@ rule add_cell_states:
         	-b {input.snp_counts_file} \
         	-o {output.out}\
         	"""
+rule clean_configs:
+            input:
+            	configs='per_sample_configs/{sample}_snp_ref_inv.txt'
 
+   	    output:
+   	    	out = 'per_sample_configs_clean/{sample}_snp_ref_inv.txt'
+   	    shell:
+   	    	"""
+   	    	Rscript clean_reads.R
+        	"""
+rule one_table:
+            input:
+            	configs=expand("per_sample_configs_clean/{sample}_snp_ref_inv.txt",  sample = SAMPLES),
+
+   	    output:
+   	    	out = 'one_table_per_snp.txt'
+   	    shell:
+   	    	"""
+   	    	Rscript 1snp_1table_allsamples.R
+        	"""
 
 
 
