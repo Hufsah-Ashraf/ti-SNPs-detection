@@ -1,6 +1,4 @@
 # Hufsah , 12.3.2021
-
-#configfile: "Snake.config.json"
 import math
 from collections import defaultdict
 
