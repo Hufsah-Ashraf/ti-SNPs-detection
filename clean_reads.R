@@ -2,6 +2,7 @@
 #we need to additionally account for the genotypes to get rid of such false signals. 
 #i.e. we accept 'forward' reads from a sample only if atleast one of it's haplotypes is 'REF'.
 #Similarly,  we accept 'inverted' reads from a sample only if atleast one of it's haplotypes is reported to be 'INV'
+#This code should be a part of 'cell_states_from_final.R'
 library(dplyr)
 library(data.table)
 library(stringr)
@@ -56,22 +57,3 @@ for (f in (1:length(files))) {
   write.table(config_file, paste0('per_sample_configs_clean/',filename), col.names = T, row.names = F, quote = F)
   
 }
-
-##if needed
-#files_link<-'per_sample_configs_clean/'
-#files <- list.files(files_link,pattern = "txt")
-#for (i in 1:length(files)){
-#  files[i]<-paste0(files_link,files[i])
-#  
-#}
-#for (f in (1:length(files))) {
-#  link<-files[f]
-#  config_file<-data.table(fread(link))
-#  config_file<-config_file %>% mutate(ref_fwd = as.numeric(ref_fwd), 
-#                                      ref_inv = as.numeric(ref_inv),
-#                                      alt_fwd = as.numeric(alt_fwd),
-#                                      alt_inv = as.numeric(alt_inv),
-#                                      inv_ID = as.character(inv_ID))
-#  write.table(config_file, link, col.names = T, row.names = F, quote = F)
-#  
-#}
