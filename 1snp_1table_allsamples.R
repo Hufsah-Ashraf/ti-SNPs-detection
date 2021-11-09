@@ -1,3 +1,4 @@
+#makes one table with all haplotype configuration counts for each snp per inversion across all samples for all inversions
 library(data.table)
 library(dplyr)
 files_link<-'per_sample_configs_clean/'
