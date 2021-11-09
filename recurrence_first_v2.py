@@ -25,16 +25,10 @@ def counts(input_bam, input_bed,count_output, input_vcf,sample):
         # Load the according file
         file_name = str(file).strip().split("/")[-1]
         cell=file_name.strip().split(".bam")[0]
-        #sample_n=cell.strip().split("x")
-        #if len(sample_n)>1:
-        #    sample=sample_n[0]
-        #else:
-        #    sample=cell.strip().split("_")[0]
         bam_file = pysam.AlignmentFile(file, "rb")
         # Also get the bed_file
         with open(input_bed, 'r') as bed_file:
-            #next(bed_file) #skipping the header in bed file
-            # Iterate over each manual segment aka each bed file line
+            # Iterate over each bed file entry
             for line in bed_file:
                 line_r = line.strip().split("\t")
                 chromosome= line_r[0]
@@ -97,7 +91,7 @@ def counts(input_bam, input_bed,count_output, input_vcf,sample):
                                 assert rec_pos not in seen_positions
                                 seen_positions.add(rec_pos)
 
-                                # a variant should be processed only if it lie somehere with the read mapping region
+                                # a variant should be processed only if it lies somehere within the read mapping region
                                 if rec_pos>=coord_ref_start and rec_pos<=coord_ref_end:
                                     index_all_tuples=index_counter
                                     for t in range(len(readinfo)):
@@ -143,7 +137,7 @@ def counts(input_bam, input_bed,count_output, input_vcf,sample):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("-i", "--input_bam", help="The input bam files path", required=True)
-    parser.add_argument("-b", "--input_bed", type=str, help="The bed file with 'passed' and 'simple' inversion segments",required=True)
+    parser.add_argument("-b", "--input_bed", type=str, help="The bed file with inversion segments",required=True)
     parser.add_argument("-v", "--input_vcf",type=str, help="The vcf file containing only bi allelic SNVs, sorted by bcftools", required=True)
     parser.add_argument("-o", "--count_output",type=str, help="The output file with watson and crick reads for each SNP allele (one per sample)", required=True)
     parser.add_argument("-s", "--sample", help="The sample name", required=True)
