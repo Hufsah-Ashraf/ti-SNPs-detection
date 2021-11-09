@@ -1,4 +1,4 @@
-# Hufsah Ashraf
+# tiSNPs Detection
 
 ## Pipeline to anaylse inversions for recurrence by identifying SNPs discrepant with a single event origin.
 
