@@ -4,13 +4,8 @@
 #furthermore, combines all cells and outputs for each sample one 4 cell table per inversion
 oldw <- getOption("warn")
 options(warn = -1)
-
-#!/usr/bin/env Rscript
 suppressMessages(library("optparse"))
 suppressMessages(library(tidyverse))
-#suppressMessages(library("stringr"))
-# Slighlty obscure package to handle numbers smaller than 10^-300 (LLHs can get small...)
-#suppressMessages(library("Brobdingnag"))
 option_list = list( 
   make_option(c("-f", "--file"), type="character", default=NULL, 
               help="final.txt files produced by mosaicatcher", metavar="character"),
@@ -27,28 +22,14 @@ states_link = opt$file
 counts_link = opt$bed
 #genotypes_link=opt$gts
 outdir_raw = opt$outdir
-#for testing on one sample
-#states_link ='/home/hufsah/HILBERT_gpfs/HGSVC/Recurrence_on_HILBERT/allfinals/HG01573/100000_fixed_norm.selected_j0.1_s0.1/final.txt'
-#counts_link='output/HG01573/snp_strand_counts.txt'
-#genotypes_link='arbigent_genotypes.vcf'
 states<- read.table(states_link, header=T)
 snp_counts<- read.table(counts_link, header=T)
-#sample_list<-str_split_fixed(snp_counts[1,'sample'], pattern = '_', n=Inf)
-#sample<-str_split_fixed(sample_list[2], pattern = 'x', n=Inf)[1]
 sample = str_match(states_link, "([HG|NA|GM]+[0-9]{3,5})")[,2]
 print(sample)
 #getting state info from 'final.txt' the same way as mosaiCatcher does
 # Assign strand states to all chromosomes (ignoring the position, for now)
 snp_counts<-left_join(snp_counts, states, by = c("cell","chrom"))
 snp_counts <- snp_counts[(snp_counts$inv_start >= snp_counts$start & snp_counts$inv_end <=snp_counts$end),]
-#read the genotypes_table
-#genotypes<-read.table(genotypes_link, header=T, sep='\t')
-#sample_genotypes<-data.frame(genotypes$chrom, genotypes$start, genotypes$end, genotypes$ID,genotypes[,sample])
-#colnames(sample_genotypes)<-c('chrom','inv_start','inv_end', 'inv_ID', 'GT')
-#snp_counts <- snp_counts %>%  mutate(chrom = as.character(chrom),
-#                               inv_start = as.numeric(as.character(inv_start)),
-#                               inv_end = as.numeric(as.character(inv_end)))
-#snp_counts<-left_join(snp_counts, sample_genotypes, by= c('chrom','inv_start','inv_end', 'inv_ID'))
 #filter out the entries where class is anything other than CC and WW (it includes removing the cells where the class entries are NA or '?')
 snp_counts_filtered<-data.frame(snp_counts[!is.na(snp_counts$class) & (snp_counts$class=='CC'| snp_counts$class=='WW'),])
 #for WW cells, translate W-->forward and C-->inverted (and vice versa for CC)
@@ -58,10 +39,7 @@ snp_counts_filtered$strand<-ifelse(((snp_counts_filtered$class=='CC'& snp_counts
 
 
 
-#trying to get one consensus across cells
-#test_data<-data.frame(snp_counts_filtered[snp_counts_filtered$inv_ID=='chr1-108311641-INV-57304',])
-#test_data_cons<-test_data %>% group_by(inv_start, inv_end, inv_ID, snp_pos,ref_allele, alt_allele, seen_allele, strand, GT) %>% 
-#  summarize(count = sum(count), NumFrames = n())
+#get consensus across cells
 snp_counts_cons<-snp_counts_filtered %>% group_by(sample.x, chrom, inv_start, inv_end, inv_ID, snp_pos,ref_allele, alt_allele, seen_allele, strand, snp_AF) %>% 
   summarize(count = sum(count), NumFrames = n())
 sub<-data.frame(snp_counts_cons$sample.x,snp_counts_cons$chrom, snp_counts_cons$inv_start, snp_counts_cons$inv_end, snp_counts_cons$inv_ID,
@@ -70,7 +48,7 @@ sub<-data.frame(snp_counts_cons$sample.x,snp_counts_cons$chrom, snp_counts_cons$
 #and more if each of them exist in forward as well as inverted orientation
 unique<-sub[!duplicated(sub), ]
 colnames(unique)<-c('sample','chrom','inv_start','inv_end', 'inv_ID','snp_pos','ref_allele','alt_allele', 'snp_AF')
-#if want to get tables with absolute read counts run the following 
+#to get tables with absolute read counts
 #(a)
 unique$ref_fwd<-NA
 unique$ref_inv<-NA
@@ -98,38 +76,6 @@ for (i in 1:length(snp_counts_cons$chrom)){
   
 }
 unique[is.na(unique)]<-0
-unique_temp<-unique
-#end of (a)
-#if we are not interested in absolute read counts rather in the haplotype configurations run the following
-#this would give 1 if a haplotype configuration is present and 0 if not
-#(b)
-#unique$ref_fwd<-NA
-#unique$ref_inv<-NA
-#unique$alt_fwd<-NA
-#unique$alt_inv<-NA
-#snp_counts_cons<-data.frame(snp_counts_cons)#otherwise the column entries behave weirdly because of the grouping done above
-#for (i in 1:length(snp_counts_cons$chrom)){
-#  index<-which(unique$sample==snp_counts_cons[i,'sample'] & unique$inv_ID==snp_counts_cons[i,'inv_ID']&
-#                 unique$snp_pos==snp_counts_cons[i,'snp_pos']&unique$ref_allele==snp_counts_cons[i,'ref_allele'] & 
-#                 unique$alt_allele==snp_counts_cons[i,'alt_allele'])
-#  if(snp_counts_cons[i,'seen_allele']==snp_counts_cons[i,'ref_allele'] & snp_counts_cons[i,'strand']=='forward'){
-#    unique[index, 'ref_fwd']<-1
-#  }else if (snp_counts_cons[i,'seen_allele']==snp_counts_cons[i,'ref_allele'] & snp_counts_cons[i,'strand']=='inverted'){
-#    unique[index, 'ref_inv']<-1
-#    
-#  }else if (snp_counts_cons[i,'seen_allele']==snp_counts_cons[i,'alt_allele'] & snp_counts_cons[i,'strand']=='forward'){
-#    unique[index, 'alt_fwd']<-1
-#    
-#    
-#    
-#  }else if (snp_counts_cons[i,'seen_allele']==snp_counts_cons[i,'alt_allele'] & snp_counts_cons[i,'strand']=='inverted'){
-#    unique[index, 'alt_inv']<-1
-#  }
-#  
-#}
-#unique[is.na(unique)]<-0
-#end of (b)
-
 write.table(unique, file=outdir_raw, row.names = F, col.names = T, quote = F )
 
 
