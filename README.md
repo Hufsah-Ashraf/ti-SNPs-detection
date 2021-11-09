@@ -1,5 +1,6 @@
 # Hufsah Ashraf
 Pipeline to anaylse inverisons for recurrence by identifying SNPs discrepant with a single event origin.
+
 Before running the Snakefile:
     a) the alignmnet (.bam) files should be placed in '.../bam/{{sample}}/all/' and the path should be provided to 'path_to_bams'
     b) path to bi-allelic SNPs (chr1-chrX) should be provided in 'path_to_snps_1toX' and path to bi-alleic SNPs (chrY) should be provided in 'path_to_snps_Y'
