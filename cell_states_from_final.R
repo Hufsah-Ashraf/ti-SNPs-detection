@@ -44,8 +44,7 @@ snp_counts_cons<-snp_counts_filtered %>% group_by(sample.x, chrom, inv_start, in
   summarize(count = sum(count), NumFrames = n())
 sub<-data.frame(snp_counts_cons$sample.x,snp_counts_cons$chrom, snp_counts_cons$inv_start, snp_counts_cons$inv_end, snp_counts_cons$inv_ID,
                 snp_counts_cons$snp_pos, snp_counts_cons$ref_allele, snp_counts_cons$alt_allele, snp_counts_cons$snp_AF)
-#store each within inversion snp so that if they exist multiple times that can happen if both alleles are found 
-#and more if each of them exist in forward as well as inverted orientation
+#store each within inversion unique snp
 unique<-sub[!duplicated(sub), ]
 colnames(unique)<-c('sample','chrom','inv_start','inv_end', 'inv_ID','snp_pos','ref_allele','alt_allele', 'snp_AF')
 #to get tables with absolute read counts
