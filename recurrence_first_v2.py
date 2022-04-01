@@ -42,12 +42,6 @@ def counts(input_bam, input_bed,count_output, input_vcf,sample):
                     assert len(variant.alts)==1 #to make sure all snps are bi allelic
                     #if variant.info["AF"][0] >=0.2 and variant.info["AF"][0] <=0.8: #to consider only frequent snps
                     recs.append((variant.pos,variant.ref, variant.alts[0], variant.info["AF"][0]))
-                    #dictionary[(sample, cell,chromosome, interval_start, interval_end,inversion_id,variant.pos,variant.ref,variant.alts[0],variant.ref,'Watson')]=0
-                    #dictionary[(sample, cell,chromosome, interval_start, interval_end,inversion_id,variant.pos,variant.ref,variant.alts[0],variant.ref,'Crick')]=0
-                    #dictionary[(sample, cell,chromosome, interval_start, interval_end,inversion_id,variant.pos,variant.ref,variant.alts[0],variant.alts[0],'Watson')]=0
-                    #dictionary[(sample, cell,chromosome, interval_start, interval_end,inversion_id,variant.pos,variant.ref,variant.alts[0],variant.alts[0],'Crick')]=0
-
-                    #print(variant.pos,' ', variant.ref,' ',variant.alts[0])
 
 
                 for read in bam_file.fetch(chromosome, interval_start, interval_end):
@@ -65,7 +59,7 @@ def counts(input_bam, input_bed,count_output, input_vcf,sample):
                         print(readname, readinfo[0])
                     all_tuples=list()
                     i=0
-                    snp_count=0 #no_of snps a read covers
+                    snp_count=0 #no. of snps a read covers
                     index_counter=0
                     c1 = 'read.is_read2'
                     c2 = 'read.is_qcfail'
@@ -90,7 +84,6 @@ def counts(input_bam, input_bed,count_output, input_vcf,sample):
                                 rec_pos,rec_ref,rec_alt,AF= recs[r]
                                 assert rec_pos not in seen_positions
                                 seen_positions.add(rec_pos)
-
                                 # a variant should be processed only if it lies somehere within the read mapping region
                                 if rec_pos>=coord_ref_start and rec_pos<=coord_ref_end:
                                     index_all_tuples=index_counter
@@ -101,7 +94,6 @@ def counts(input_bam, input_bed,count_output, input_vcf,sample):
                                         if tup[1] is not None:
                                             all_tuples.append(tup[0])
                                             i+=1
-                                            #print(tup[1], rec_pos)
                                             if tup[1]==rec_pos:
                                                 posit= all_tuples[i-2]
                                                 if posit is not None:
@@ -109,7 +101,6 @@ def counts(input_bam, input_bed,count_output, input_vcf,sample):
                                                     print('allele was obtained from position', posit , 'in the query and all tuples was accessed at ', i-2 )
                                                 else:
                                                     allele=None
-                                                #print(rec_pos, rec_ref, rec_alt,readname,allele, orientation)
                                                 print(cell,readname,coord_ref_start, coord_ref_end,inversion_id,len(recs),rec_pos,rec_ref, rec_alt, allele, orientation)
                                                 if allele is not None and (allele==rec_ref or allele==rec_alt):
                                                     if (sample, cell,chromosome, interval_start, interval_end, inversion_id,rec_pos,rec_ref,rec_alt,allele,orientation) in dictionary:
