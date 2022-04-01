@@ -1,8 +1,8 @@
 #Hufsah Ashraf
 #Since we see reads that don't agree to the genotype sometimes e.g. inverted reads from a sample that was '0|0'
 #we need to additionally account for the genotypes to get rid of such false signals. 
-#i.e. we accept 'forward' reads from a sample only if atleast one of it's haplotypes is 'REF'.
-#Similarly,  we accept 'inverted' reads from a sample only if atleast one of it's haplotypes is reported to be 'INV'
+#i.e. we accept 'forward' reads from a sample only if atleast one of its haplotypes is 'REF'.
+#Similarly,  we accept 'inverted' reads from a sample only if atleast one of its haplotypes is reported to be 'INV'
 #This code should be a part of 'cell_states_from_final.R' (TODO)
 library(dplyr)
 library(data.table)
