@@ -4,14 +4,11 @@
 import math
 from collections import defaultdict
 
-path_to_bams = "/gpfs/project/projects/medbioinf/users/hufsah/HGSVC/ARBIGENT_CH38_WMAP/pipeline"
-path_to_snps_1toX="/gpfs/project/projects/medbioinf/users/hufsah/HGSVC/Recurrence/snp_WC_counts/annotated_phased_vcfs/downsampled_44samples"
-path_to_snps_Y= "/gpfs/project/projects/medbioinf/users/hufsah/HGSVC/Recurrence/snp_WC_counts/annotated_vcfs"
-path_to_finals ="/gpfs/project/projects/medbioinf/users/hufsah/HGSVC/Recurrence_final/finals"
-
-
-SAMPLE = (glob_wildcards("/gpfs/project/projects/medbioinf/users/hufsah/HGSVC/ARBIGENT_CH38_WMAP/pipeline/bam/{sample}/all/"))
-#SAMPLES,BAM = (glob_wildcards("/scratch/bioinf/projects/scTRIP_H/Recurrence/snp_WC_counts/test_bam/{sample}/selected/{bam}.bam"))
+path_to_bams = "path to all bam files"
+path_to_snps_1toX="path to folder containing vcf file with SNPs belonging to autosomes and chromosome X"
+path_to_snps_Y= "path to folder containing vcf file with SNPs belonging to Y chromosome"
+path_to_finals ="path to folder containing for each sample, the mosaicatcher output files reporting background cell states"
+SAMPLE = (glob_wildcards("path to all bam files/{sample}/all/"))
 S2 = tuple(i for i in SAMPLE[0])
 SAMPLES = sorted(set(S2))
 
@@ -68,7 +65,6 @@ rule add_cell_states:
             input:
             	states=expand("{path}/{{sample}}/100000_fixed_norm.selected_j0.1_s0.1/final.txt", path= path_to_finals),
             	snp_counts_file = "output/{sample}/snp_strand_counts.txt",
-            	#genotypes="arbigent_genotypes.vcf"
 
    	    output:
    	    	out = 'per_sample_configs/{sample}_snp_ref_inv.txt'
